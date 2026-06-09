@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fitness Tracker App</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f4f4;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:600px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+
+h1{
+    text-align:center;
+    color:#333;
+}
+
+input,select{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border:1px solid #ccc;
+    border-radius:5px;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    background:#28a745;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+button:hover{
+    background:#218838;
+}
+
+.dashboard{
+    margin-top:20px;
+    padding:15px;
+    background:#f9f9f9;
+    border-radius:8px;
+}
+
+.progress-container{
+    width:100%;
+    background:#ddd;
+    border-radius:20px;
+    margin-top:10px;
+}
+
+.progress-bar{
+    height:25px;
+    width:0%;
+    background:#28a745;
+    border-radius:20px;
+    text-align:center;
+    color:white;
+    line-height:25px;
+}
+
+.record{
+    background:#eef;
+    padding:10px;
+    margin-top:10px;
+    border-radius:5px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>Fitness Tracker App</h1>
+
+<input type="number" id="steps" placeholder="Enter Steps">
+
+<select id="workout">
+    <option>Walking</option>
+    <option>Running</option>
+    <option>Cycling</option>
+    <option>Gym Workout</option>
+    <option>Yoga</option>
+</select>
+
+<input type="number" id="duration" placeholder="Workout Duration (minutes)">
+
+<input type="number" id="calories" placeholder="Calories Burned">
+
+<button onclick="saveData()">Add Activity</button>
+
+<div class="dashboard">
+    <h2>Dashboard</h2>
+
+    <p><strong>Total Steps:</strong> <span id="totalSteps">0</span></p>
+
+    <p><strong>Total Calories:</strong> <span id="totalCalories">0</span></p>
+
+    <p><strong>Total Workout Time:</strong> <span id="totalDuration">0</span> mins</p>
+
+    <h3>Daily Goal Progress (10000 Steps)</h3>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar">0%</div>
+    </div>
+</div>
+
+<h2>Activity Records</h2>
+<div id="records"></div>
+
+</div>
+
+<script>
+
+let fitnessData =
+JSON.parse(localStorage.getItem("fitnessData")) || [];
+
+function saveData(){
+
+    let steps =
+    parseInt(document.getElementById("steps").value) || 0;
+
+    let workout =
+    document.getElementById("workout").value;
+
+    let duration =
+    parseInt(document.getElementById("duration").value) || 0;
+
+    let calories =
+    parseInt(document.getElementById("calories").value) || 0;
+
+    let entry = {
+        steps,
+        workout,
+        duration,
+        calories
+    };
+
+    fitnessData.push(entry);
+
+    localStorage.setItem(
+        "fitnessData",
+        JSON.stringify(fitnessData)
+    );
+
+    document.getElementById("steps").value="";
+    document.getElementById("duration").value="";
+    document.getElementById("calories").value="";
+
+    displayData();
+}
+
+function displayData(){
+
+    let totalSteps = 0;
+    let totalCalories = 0;
+    let totalDuration = 0;
+
+    let recordsHTML = "";
+
+    fitnessData.forEach(item => {
+
+        totalSteps += item.steps;
+        totalCalories += item.calories;
+        totalDuration += item.duration;
+
+        recordsHTML += `
+        <div class="record">
+            <p><b>Workout:</b> ${item.workout}</p>
+            <p>Steps: ${item.steps}</p>
+            <p>Duration: ${item.duration} mins</p>
+            <p>Calories: ${item.calories}</p>
+        </div>
+        `;
+    });
+
+    document.getElementById("records").innerHTML =
+    recordsHTML;
+
+    document.getElementById("totalSteps").innerText =
+    totalSteps;
+
+    document.getElementById("totalCalories").innerText =
+    totalCalories;
+
+    document.getElementById("totalDuration").innerText =
+    totalDuration;
+
+    let percentage =
+    Math.min((totalSteps / 10000) * 100, 100);
+
+    document.getElementById("progressBar").style.width =
+    percentage + "%";
+
+    document.getElementById("progressBar").innerText =
+    Math.round(percentage) + "%";
+}
+
+displayData();
+
+</script>
+
+</body>
+</html>
